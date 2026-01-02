@@ -76,5 +76,9 @@ def create_db():
       print("База создана, пользователь team1 добавлен")
 
 if __name__ == '__main__':
-  create_db()
-  app.run(debug=True)
+	# Всегда 0.0.0.0 - будет работать везде!
+	# Но debug только локально
+	create_db()
+	port = int(os.environ.get('PORT', 5000))
+	debug = not os.environ.get('RENDER')  # True локально, False на Render
+	app.run(host='0.0.0.0', port=port, debug=debug)
