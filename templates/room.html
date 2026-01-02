@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тайная комната</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <audio autoplay loop>
+        <source src="{{ url_for('static', filename='music/room_theme.mp3') }}" type="audio/mpeg">
+    </audio>
+
+    <!-- ПЯТНАШКИ (Поверх всего) -->
+    <div id="puzzle-container">
+        <h1 style="color: white; margin-bottom: 20px;">Собери ключ</h1>
+        <div id="puzzle-board"></div>
+    </div>
+
+    <!-- КОМНАТА (Скрыта) -->
+    <div id="secret-room" style="display: none;">
+
+
+        <!-- Обертка для адаптивности (как на главной) -->
+        <div class="game-wrapper">
+            
+            <!-- ФОН КОМНАТЫ -->
+            <img src="{{ url_for('static', filename='img/room_bg.jpg') }}" class="game-bg">
+
+            <!-- ЗОНА 1 (Клик открывает модалку 1) -->
+            <div class="click-zone zone-item-1 absolute-item" onclick="openModal('modal1')"></div>
+
+            <!-- ЗОНА 2 (Клик открывает модалку 2) -->
+            <div class="click-zone zone-item-2 absolute-item" onclick="openModal('modal2')"></div>
+        </div>
+
+    </div>
+
+    <!-- Модалки -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal1')">&times;</span>
+            <img src="{{ url_for('static', filename='img/popup_img.png') }}" style="max-width: 100%;">
+            <br>
+            <a href="{{ url_for('download_file', filename='secret_file.txt') }}" class="download-btn">Скачать файл</a>
+        </div>
+    </div>
+
+    <div id="modal2" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal2')">&times;</span>
+            <h2>Вторая загадка</h2>
+            <p>Пусто...</p>
+        </div>
+    </div>
+    <div id="white-overlay"></div>
+    <script src="{{ url_for('static', filename='js/puzzle.js') }}"></script>
+</body>
+</html>

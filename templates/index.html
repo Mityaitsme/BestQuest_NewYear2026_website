@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Важно для телефона! -->
+    <title>Главный Холл</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    
+    <audio autoplay loop>
+        <source src="{{ url_for('static', filename='music/main_theme.mp3') }}" type="audio/mpeg">
+    </audio>
+
+    <div class="hud">Счет: {{ score }}</div>
+
+    <!-- КОНТЕЙНЕР: Всё лежит здесь -->
+    <div class="game-wrapper">
+        
+        <!-- 1. ФОН КАК ОБЪЕКТ -->
+        <img src="{{ url_for('static', filename='img/bg_main.jpg') }}" class="game-bg" alt="Фон">
+
+        {% if score >= 100 %}
+            <a href="{{ url_for('room') }}" class="click-zone zone-enter-room absolute-item"></a>
+        {% endif %}
+
+        <!-- 3. ОЛЕНЬ (появляется раньше, например, при счете > 50) -->
+        {% if score > 50 %}
+            <img src="{{ url_for('static', filename='img/deer.gif') }}" class="moving-object deer">
+        {% endif %}
+        
+    </div>
+
+</body>
+</html>

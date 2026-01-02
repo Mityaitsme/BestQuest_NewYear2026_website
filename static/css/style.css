@@ -1,0 +1,163 @@
+/* style.css */
+
+/* Общие стили */
+body, html { 
+    margin: 0; 
+    padding: 0; 
+    width: 100%; 
+    /* height: 100%; <--- УДАЛЯЕМ или меняем на min-height */
+    min-height: 100%;
+    font-family: sans-serif; 
+    background-color: #000;
+    
+    /* Разрешаем вертикальную прокрутку, если контент не влезает */
+    overflow-y: auto; 
+    overflow-x: hidden; /* Горизонтальную убираем */
+}
+
+/* --- СИСТЕМА АДАПТИВНОСТИ (WRAPPER) --- */
+
+/* Контейнер, который держит картинку и зоны вместе */
+.game-wrapper {
+    position: relative; /* Это якорь для абсолютных элементов внутри */
+    width: 100%;
+    max-width: 1200px; /* Ограничение ширины (можно убрать, если хочешь во весь экран) */
+    margin: 0 auto;    /* Центрируем контейнер */
+}
+
+/* Сама картинка-фон */
+.game-bg {
+    width: 100%;      /* Растягиваем на ширину контейнера */
+    height: auto;     /* Высота подстраивается автоматически */
+    display: block;   /* Убирает нижний отступ */
+}
+
+/* Базовый класс для всех зон и объектов */
+.absolute-item {
+    position: absolute;
+    /* border: 2px solid yellow; */ /* Включи для тестов */
+    z-index: 10;
+}
+
+/* Кликабельная зона (прозрачная) */
+.click-zone {
+    cursor: pointer;
+    background-color: rgba(255, 0, 0, 0.5); /* ВРЕМЕННО: красный цвет, чтобы видеть */
+    /* Когда настроишь, замени на: background-color: transparent; */
+}
+
+/* --- НАСТРОЙКИ КООРДИНАТ (В ПРОЦЕНТАХ!) --- */
+
+/* 1. Главная страница: Зона перехода */
+.zone-enter-room {
+    top: 40%;    /* Отступ сверху (от высоты картинки) */
+    left: 60%;   /* Отступ слева (от ширины картинки) */
+    width: 15%;  /* Ширина зоны */
+    height: 20%; /* Высота зоны */
+}
+
+/* 2. Комната: Предмет 1 */
+.zone-item-1 {
+    top: 70%;
+    left: 20%;
+    width: 10%;
+    height: 10%;
+}
+
+/* 3. Комната: Предмет 2 */
+.zone-item-2 {
+    top: 30%;
+    right: 20%; /* Можно использовать right вместо left */
+    width: 8%;
+    height: 15%;
+}
+
+/* Олень */
+.moving-object.deer {
+    position: absolute;
+    width: 15%; /* Размер оленя тоже в % от ширины фона */
+    bottom: 10%;
+    animation: runAcross 15s linear infinite;
+    z-index: 5;
+}
+
+@keyframes runAcross {
+    0% { left: -20%; transform: scaleX(1); }
+    49% { transform: scaleX(1); }
+    50% { left: 100%; transform: scaleX(-1); }
+    99% { transform: scaleX(-1); }
+    100% { left: -20%; transform: scaleX(1); }
+}
+
+.hud { 
+    position: fixed; /* Фиксируем счетчик относительно ЭКРАНА, а не картинки */
+    top: 20px; left: 20px; 
+    color: white; font-size: 24px; 
+    background: rgba(0,0,0,0.5); padding: 10px; 
+    z-index: 100;
+}
+
+/* --- ПЯТНАШКИ --- */
+#puzzle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* На весь экран */
+    background: #222;
+    z-index: 200;
+    position: absolute;
+    top: 0; left: 0; width: 100%;
+}
+
+#puzzle-board {
+    display: grid;
+    grid-template-columns: repeat(4, 80px);
+    grid-template-rows: repeat(4, 80px);
+    gap: 2px;
+    background: #555;
+    border: 5px solid #fff;
+}
+
+.tile {
+    width: 80px; height: 80px;
+    background-color: #ddd;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 24px; color: #333; cursor: pointer; user-select: none;
+}
+.tile.empty { background: transparent; cursor: default; }
+
+/* --- МОДАЛКИ --- */
+.modal {
+    display: none; 
+    position: fixed; z-index: 999; 
+    left: 0; top: 0; width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.8); 
+}
+.modal-content {
+    background-color: #fefefe; margin: 10% auto; padding: 20px;
+    border: 1px solid #888; width: 80%; max-width: 600px;
+    text-align: center; position: relative;
+}
+.close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+.download-btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: green; color: white; text-decoration: none; border-radius: 5px; }
+
+#white-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* ГАРАНТИРОВАННО БЕЛЫЙ ЦВЕТ */
+    background-color: #ffffff !important; 
+    
+    /* Слой выше всего на свете */
+    z-index: 999999; 
+    
+    opacity: 0;
+    pointer-events: none;
+    
+    /* Время анимации: 3 секунды */
+    transition: opacity 3s ease-in-out; 
+}
