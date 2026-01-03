@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Важно для телефона! -->
-    <title>Главный Холл</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лес</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -12,24 +12,113 @@
         <source src="{{ url_for('static', filename='music/main_theme.mp3') }}" type="audio/mpeg">
     </audio>
 
-    <div class="hud">Счет: {{ score }}</div>
-
-    <!-- КОНТЕЙНЕР: Всё лежит здесь -->
+    <!-- КОНТЕЙНЕР -->
     <div class="game-wrapper">
-        
-        <!-- 1. ФОН КАК ОБЪЕКТ -->
+
         <img src="{{ url_for('static', filename='img/bg_main.jpg') }}" class="game-bg" alt="Фон">
 
-        {% if score >= 100 %}
+        <!-- Переход (при score >= 3) -->
+        {% if score >= 3 %}
             <a href="{{ url_for('room') }}" class="click-zone zone-enter-room absolute-item"></a>
         {% endif %}
 
-        <!-- 3. ОЛЕНЬ (появляется раньше, например, при счете > 50) -->
-        {% if score > 50 %}
-            <img src="{{ url_for('static', filename='img/deer.gif') }}" class="moving-object deer">
+        <!-- ОЛЕНЬ 1 (быстрый) -->
+        {% if score >= 1 %}
+            <img src="{{ url_for('static', filename='img/deer.gif') }}" class="moving-object deer one">
+        {% endif %}
+
+        <!-- ОЛЕНЬ 2 (медленный) -->
+        {% if score >= 1 %}
+            <img src="{{ url_for('static', filename='img/deer.gif') }}" class="moving-object deer two">
+        {% endif %}
+
+        <!-- СНЕГОВИК (стоит) -->
+        {% if score >= 2 %}
+            <img src="{{ url_for('static', filename='img/snowman.gif') }}" class="moving-object snowman">
+        {% endif %}
+
+        <!-- САНИ (стоят) -->
+        {% if score >= 5 %}
+            <img src="{{ url_for('static', filename='img/sleigh.png') }}" class="moving-object sleigh">
+        {% endif %}
+
+        <!-- ЭЛЬФЫ (ходят) -->
+        {% if score > 8 %}
+            <img src="{{ url_for('static', filename='img/elfs/elf1.gif') }}" class="elf e1">
+            <img src="{{ url_for('static', filename='img/elfs/elf2.gif') }}" class="elf e2">
+            <img src="{{ url_for('static', filename='img/elfs/elf3.gif') }}" class="elf e3">
+            <img src="{{ url_for('static', filename='img/elfs/elf4.gif') }}" class="elf e4">
         {% endif %}
         
     </div>
+
+    <!-- СКРИПТ ДЛЯ ЭФФЕКТА СНЕЖИНОК ПРИ КЛИКЕ -->
+    <script>
+        document.addEventListener('click', function(e) {
+            // Количество частиц
+            const particleCount = 10;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const flake = document.createElement('img');
+                // Укажи здесь путь к своей картинке маленькой снежинки
+                flake.src = "{{ url_for('static', filename='img/snowflake.png') }}";
+                flake.classList.add('click-snowflake');
+                
+                // Ставим снежинку туда, где был клик
+                // pageX/pageY учитывают прокрутку, что нам и нужно
+                flake.style.left = (e.pageX - 10) + 'px'; // -10 чтобы центрировать (половина ширины)
+                flake.style.top = (e.pageY - 10) + 'px';
+
+                // Генерируем случайное направление полета
+                // tx - смещение по X (от -100px до +100px)
+                // ty - смещение по Y (падает вниз: от -50px до +150px)
+                const tx = (Math.random() - 0.5) * 200; 
+                const ty = (Math.random() - 0.5) * 200 + 50; // +50 чтобы в среднем падали вниз (гравитация)
+
+                // Передаем эти случайные числа в CSS переменные
+                flake.style.setProperty('--tx', `${tx}px`);
+                flake.style.setProperty('--ty', `${ty}px`);
+
+                document.body.appendChild(flake);
+
+                // Удаляем элемент через 1 секунду (когда анимация закончится), чтобы не засорять память
+                setTimeout(() => {
+                    flake.remove();
+                }, 1000);
+            }
+        });
+    </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var audio = document.querySelector("audio");
+        
+        // Уникальный ID для сохранения (чтобы темы главной и комнаты не путались)
+        // Для index.html используй 'main_theme_time', для room.html используй 'room_theme_time'
+        // Или, если музыка одна на весь сайт, просто 'bg_music_time'
+        var storageKey = "game_music_time"; 
+
+        // 1. При загрузке восстанавливаем время
+        var savedTime = localStorage.getItem(storageKey);
+        if (savedTime && audio) {
+            audio.currentTime = parseFloat(savedTime);
+            // Пытаемся запустить (браузер может блокировать автоплей без клика, но после логина обычно разрешает)
+            var playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Автоплей блокирован браузером пока нет клика");
+                });
+            }
+        }
+
+        // 2. Постоянно сохраняем текущее время (каждую секунду)
+        if (audio) {
+            audio.addEventListener("timeupdate", function() {
+                localStorage.setItem(storageKey, audio.currentTime);
+            });
+        }
+    });
+</script>
 
 </body>
 </html>

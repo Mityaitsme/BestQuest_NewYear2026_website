@@ -5,96 +5,167 @@ body, html {
     margin: 0; 
     padding: 0; 
     width: 100%; 
-    /* height: 100%; <--- УДАЛЯЕМ или меняем на min-height */
     min-height: 100%;
     font-family: sans-serif; 
     background-color: #000;
-    
-    /* Разрешаем вертикальную прокрутку, если контент не влезает */
     overflow-y: auto; 
-    overflow-x: hidden; /* Горизонтальную убираем */
+    overflow-x: hidden;
 }
 
-/* --- СИСТЕМА АДАПТИВНОСТИ (WRAPPER) --- */
-
-/* Контейнер, который держит картинку и зоны вместе */
+/* --- КОНТЕЙНЕР (Исправлено для растягивания) --- */
 .game-wrapper {
-    position: relative; /* Это якорь для абсолютных элементов внутри */
+    position: relative;
     width: 100%;
-    max-width: 1200px; /* Ограничение ширины (можно убрать, если хочешь во весь экран) */
-    margin: 0 auto;    /* Центрируем контейнер */
+    /* max-width: 1200px; <--- УДАЛИЛИ ЭТУ СТРОКУ, теперь фон на всю ширину */
+    margin: 0 auto;
+    overflow: hidden; /* Чтобы вылетающие за край олени не создавали полосу прокрутки */
 }
 
-/* Сама картинка-фон */
 .game-bg {
-    width: 100%;      /* Растягиваем на ширину контейнера */
-    height: auto;     /* Высота подстраивается автоматически */
-    display: block;   /* Убирает нижний отступ */
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
-/* Базовый класс для всех зон и объектов */
 .absolute-item {
     position: absolute;
-    /* border: 2px solid yellow; */ /* Включи для тестов */
     z-index: 10;
+}
+
+/* --- ОБЪЕКТЫ НА ГЛАВНОЙ --- */
+
+/* 1. ОЛЕНИ (Бегают) */
+.moving-object.deer {
+    position: absolute;
+    width: 10%; /* Чуть уменьшил, чтобы влезли */
+    z-index: 5;
+}
+
+.deer.one {
+    bottom: 15%;
+    width: 24%;
+    /* Бежит быстро (10 сек), начинает с задержкой 0 сек */
+    animation: runAcross 10s linear infinite;
+}
+
+.deer.two {
+    bottom: 5%; /* Чуть ниже первого */
+    width: 27%; /* Чуть крупнее (перспектива) */
+    z-index: 6;
+    /* Бежит медленнее (18 сек) и стартует с задержкой 2 сек */
+    animation: runAcross 18s linear infinite 2s;
+}
+
+@keyframes runAcross {
+    0% { left: -20%; transform: scaleX(1); }
+    49% { transform: scaleX(1); }
+    50% { left: 100%; transform: scaleX(-1); } /* Разворот */
+    99% { transform: scaleX(-1); }
+    100% { left: -20%; transform: scaleX(1); }
+}
+
+/* 2. ЭЛЬФЫ (Ходят туда-сюда) */
+.elf {
+    position: absolute;
+    width: 15%; /* Маленькие */
+    z-index: 4;
+    animation: walkAround 2s ease-in-out infinite alternate;
+}
+
+/* Расставляем эльфов в разные места */
+.elf.e1 { bottom: 40%; left: 3%; animation-delay: 0s; }
+.elf.e2 { bottom: 39%; left: 30%; animation-delay: 0.5s; }
+.elf.e3 { bottom: 25%; left: 0%; animation-delay: 1s; }
+.elf.e4 { bottom: 32%; left: 12%; animation-delay: 1.5s; }
+
+@keyframes walkAround {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(30px); } /* Ходят на 30 пикселей вправо и обратно */
+}
+
+/* 3. СНЕГОВИК (Стоит) */
+.snowman {
+    position: absolute;
+    top: 23%;
+    left: 40%;
+    width: 17%;
+    z-index: 4;
+}
+
+/* 4. САНИ (Стоят) */
+.sleigh {
+    position: absolute;
+    top: 25%;
+    left: 77%; /* Слева вверху на сугробе */
+    width: 23%;
+    z-index: 3;
+}
+
+/* --- СНЕЖИНКИ (ЭФФЕКТ КЛИКА) --- */
+.click-snowflake {
+    position: absolute;
+    width: 30px; /* Размер частицы */
+    height: 30px;
+    pointer-events: none; /* Чтобы сквозь них можно было кликать */
+    z-index: 9999;
+    opacity: 1;
+    /* Анимация полета */
+    animation: flyOut 1s forwards ease-out;
+}
+
+@keyframes flyOut {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        /* Эти переменные --tx и --ty мы зададим в JS случайно для каждой снежинки */
+        transform: translate(var(--tx), var(--ty)) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* --- ОСТАЛЬНОЕ --- */
+.hud { 
+    position: fixed; 
+    top: 20px; left: 20px; 
+    color: white; font-size: 24px; 
+    background: rgba(0,0,0,0.5); padding: 10px; 
+    z-index: 100;
 }
 
 /* Кликабельная зона (прозрачная) */
 .click-zone {
     cursor: pointer;
-    background-color: rgba(255, 0, 0, 0.5); /* ВРЕМЕННО: красный цвет, чтобы видеть */
-    /* Когда настроишь, замени на: background-color: transparent; */
+    /*background-color: rgba(255, 0, 0, 0.5); ВРЕМЕННО: красный цвет, чтобы видеть */
+    /* Когда настроишь, замени на: */
+    background-color: transparent;
 }
 
 /* --- НАСТРОЙКИ КООРДИНАТ (В ПРОЦЕНТАХ!) --- */
 
 /* 1. Главная страница: Зона перехода */
 .zone-enter-room {
-    top: 40%;    /* Отступ сверху (от высоты картинки) */
-    left: 60%;   /* Отступ слева (от ширины картинки) */
-    width: 15%;  /* Ширина зоны */
-    height: 20%; /* Высота зоны */
+    top: 31%;    /* Отступ сверху (от высоты картинки) */
+    left: 69%;   /* Отступ слева (от ширины картинки) */
+    width: 5%;  /* Ширина зоны */
+    height: 16%; /* Высота зоны */
 }
 
 /* 2. Комната: Предмет 1 */
 .zone-item-1 {
-    top: 70%;
-    left: 20%;
-    width: 10%;
-    height: 10%;
+    top: 77%;
+    left: 24%;
+    width: 18%;
+    height: 11%;
 }
 
 /* 3. Комната: Предмет 2 */
 .zone-item-2 {
-    top: 30%;
-    right: 20%; /* Можно использовать right вместо left */
-    width: 8%;
-    height: 15%;
-}
-
-/* Олень */
-.moving-object.deer {
-    position: absolute;
-    width: 15%; /* Размер оленя тоже в % от ширины фона */
-    bottom: 10%;
-    animation: runAcross 15s linear infinite;
-    z-index: 5;
-}
-
-@keyframes runAcross {
-    0% { left: -20%; transform: scaleX(1); }
-    49% { transform: scaleX(1); }
-    50% { left: 100%; transform: scaleX(-1); }
-    99% { transform: scaleX(-1); }
-    100% { left: -20%; transform: scaleX(1); }
-}
-
-.hud { 
-    position: fixed; /* Фиксируем счетчик относительно ЭКРАНА, а не картинки */
-    top: 20px; left: 20px; 
-    color: white; font-size: 24px; 
-    background: rgba(0,0,0,0.5); padding: 10px; 
-    z-index: 100;
+    top: 12%;
+    left: 49%; /* Можно использовать right вместо left */
+    width: 36%;
+    height: 42%;
 }
 
 /* --- ПЯТНАШКИ --- */
@@ -103,24 +174,40 @@ body, html {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh; /* На весь экран */
-    background: #222;
+    height: 100vh;
+    /* background: #222; <--- УДАЛЯЕМ серый фон, теперь там будет картинка */
     z-index: 200;
     position: absolute;
     top: 0; left: 0; width: 100%;
+    overflow: hidden; /* Чтобы картинка не вылезала */
+}
+
+/* Новые стили для фона-двери */
+.puzzle-bg {
+    position: absolute; /* Вырываем из потока */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Картинка красиво заполнит весь экран */
+    z-index: 1; /* Самый нижний слой */
+    opacity: 0.7; /* (Опционально) Можно затемнить, чтобы пятнашки было лучше видно */
 }
 
 #puzzle-board {
     display: grid;
-    grid-template-columns: repeat(4, 80px);
-    grid-template-rows: repeat(4, 80px);
+    grid-template-columns: repeat(4, 120px);
+    grid-template-rows: repeat(4, 120px);
     gap: 2px;
     background: #555;
-    border: 5px solid #fff;
+    
+    /* ГЛАВНОЕ: поднимаем доску над картинкой */
+    position: relative; 
+    z-index: 2; 
 }
 
 .tile {
-    width: 80px; height: 80px;
+    width: 120px; height: 120px;
     background-color: #ddd;
     display: flex; justify-content: center; align-items: center;
     font-size: 24px; color: #333; cursor: pointer; user-select: none;

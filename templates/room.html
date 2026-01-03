@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тайная комната</title>
+    <title>Хранилище</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -14,8 +14,13 @@
 
     <!-- ПЯТНАШКИ (Поверх всего) -->
     <div id="puzzle-container">
-        <h1 style="color: white; margin-bottom: 20px;">Собери ключ</h1>
+        
+        <!-- Картинка фона (Дверь) -->
+        <img src="{{ url_for('static', filename='img/door.jpg') }}" class="puzzle-bg">
+        
+        <!-- Доска с пятнашками -->
         <div id="puzzle-board"></div>
+        
     </div>
 
     <!-- КОМНАТА (Скрыта) -->
@@ -38,23 +43,65 @@
     </div>
 
     <!-- Модалки -->
-    <div id="modal1" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('modal1')">&times;</span>
-            <img src="{{ url_for('static', filename='img/popup_img.png') }}" style="max-width: 100%;">
-            <br>
-            <a href="{{ url_for('download_file', filename='secret_file.txt') }}" class="download-btn">Скачать файл</a>
-        </div>
-    </div>
-
     <div id="modal2" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('modal2')">&times;</span>
-            <h2>Вторая загадка</h2>
-            <p>Пусто...</p>
+            <img src="{{ url_for('static', filename='img/sleigh_schema.jpg') }}" style="max-width: 100%;">
+            <br>
+            <a href="{{ url_for('download_file', filename='sleigh_schema.pdf') }}" class="download-btn">Скачать файл</a>
+        </div>
+    </div>
+
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal1')">&times;</span>
+            <h2>МАГИЧЕСКАЯ ПЫЛЬ</h2>
+            <p><u><i>Тип:</i></u> волшебное вещество</p>
+            <p><u><i>Характеристика:</i></u> сухая смесь из маленьких блестящих частиц 
+              разных цветов (нередко розоватых оттенков)</p><p>
+            <u><i>Свойства:</i></u> стирает воспоминания за последнее время</p><p>
+            <u><i>Способ применения:</i></u> если при раздаче подарков в новогоднюю ночь 
+            ребёнок или взрослый проснулся и заметил Санту / кого-то из его помощников, 
+            необходимо распылить щепотку магической пыли. Она подействует достаточно 
+            быстро, и человек забудет про это взаимодействие.</p><p>
+            <u><i>Рекомендации по использованию:</i></u> необходимо брать с собой на 
+            раздачу подарков в целях гарантированного сохранения конфиденциальности.</p><p>
+            <u><i>Противопоказания:</i></u> превышение дозировки приводит к серьезным 
+            провалам в памяти, в критических дозах - даже к амнезии.</p>
         </div>
     </div>
     <div id="white-overlay"></div>
     <script src="{{ url_for('static', filename='js/puzzle.js') }}"></script>
-</body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var audio = document.querySelector("audio");
+        
+        // Уникальный ID для сохранения (чтобы темы главной и комнаты не путались)
+        // Для index.html используй 'main_theme_time', для room.html используй 'room_theme_time'
+        // Или, если музыка одна на весь сайт, просто 'bg_music_time'
+        var storageKey = "game_music_time"; 
+
+        // 1. При загрузке восстанавливаем время
+        var savedTime = localStorage.getItem(storageKey);
+        if (savedTime && audio) {
+            audio.currentTime = parseFloat(savedTime);
+            // Пытаемся запустить (браузер может блокировать автоплей без клика, но после логина обычно разрешает)
+            var playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Автоплей блокирован браузером пока нет клика");
+                });
+            }
+        }
+
+        // 2. Постоянно сохраняем текущее время (каждую секунду)
+        if (audio) {
+            audio.addEventListener("timeupdate", function() {
+                localStorage.setItem(storageKey, audio.currentTime);
+            });
+        }
+    });
+</script>
+  </body>
 </html>
